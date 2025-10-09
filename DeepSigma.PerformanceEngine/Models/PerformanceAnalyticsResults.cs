@@ -6,7 +6,7 @@ namespace DeepSigma.PerformanceEngine.Models;
 /// <summary>
 /// Performance analytics results for a specified time period.
 /// </summary>
-public class PerformanceAnalyticsResults : IJSONIO<PerformanceAnalyticsResults>
+public class PerformanceAnalyticsResults : IJSONSerializer<PerformanceAnalyticsResults>
 {
     /// <summary>
     /// Time period for the performance analytics.

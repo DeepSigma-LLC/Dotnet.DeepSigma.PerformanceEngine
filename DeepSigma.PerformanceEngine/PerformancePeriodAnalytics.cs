@@ -1,6 +1,6 @@
 ﻿using DeepSigma.PerformanceEngine.Enums;
 using DeepSigma.PerformanceEngine.Models;
-using DeepSigma.General.Mathematics;
+using DeepSigma.Mathematics;
 using DeepSigma.General.Extensions;
 
 namespace DeepSigma.PerformanceEngine;

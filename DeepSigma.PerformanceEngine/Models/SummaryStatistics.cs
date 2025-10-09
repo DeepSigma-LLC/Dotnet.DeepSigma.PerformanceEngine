@@ -6,7 +6,7 @@ namespace DeepSigma.PerformanceEngine.Models;
 /// <summary>
 /// Summary statistics for a set of performance data points.
 /// </summary>
-public class SummaryStatistics : IJSONIO<SummaryStatistics>
+public class SummaryStatistics : IJSONSerializer<SummaryStatistics>
 {
     /// <summary>
     /// The latest date in the observation period.
