@@ -1,6 +1,6 @@
 ﻿using DeepSigma.General.Extensions;
 using DeepSigma.PerformanceEngine.Enums;
-using DeepSigma.General;
+using DeepSigma.General.TimeStepper;
 using DeepSigma.PerformanceEngine.Models;
 using DeepSigma.General.Enums;
 
