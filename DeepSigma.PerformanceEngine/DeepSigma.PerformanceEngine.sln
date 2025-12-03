@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11018.127 d18.0
+VisualStudioVersion = 18.0.11018.127
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSigma.PerformanceEngine", "DeepSigma.PerformanceEngine.csproj", "{821F3758-2006-4D20-B725-85483075552C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSigma.PerfomanceEngine.Tests", "..\DeepSigma.PerfomanceEngine.Tests\DeepSigma.PerfomanceEngine.Tests.csproj", "{E5890E89-45EB-41CB-95F0-9AFC12326AE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSigma.PerformanceEngine.Tests", "..\DeepSigma.PerfomanceEngine.Tests\DeepSigma.PerformanceEngine.Tests.csproj", "{E5890E89-45EB-41CB-95F0-9AFC12326AE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

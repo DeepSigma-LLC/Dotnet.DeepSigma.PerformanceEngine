@@ -8,17 +8,26 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DeepSigma Performance Engine</Title>
     <Authors>DeepSigma LLC</Authors>
-    <Version>1.0.1.0</Version>
+    <Version>1.1.0.0</Version>
     <Description>C# library for computing investment performance.</Description>
-    <PackageProjectUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine.git</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine</RepositoryUrl>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
+    <PackageIcon>Assets\DeepSigma.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DeepSigma.General" Version="1.0.2" />
     <PackageReference Include="DeepSigma.Mathematics" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\DeepSigma.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
