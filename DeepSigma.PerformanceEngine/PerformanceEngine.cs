@@ -13,15 +13,15 @@ namespace DeepSigma.PerformanceEngine;
 /// </summary>
 public class PerformanceEngine
 {
-    private SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; } = [];
-    private SortedDictionary<DateOnly, decimal> PortfolioReturns { get; set; } = [];
-    private SortedDictionary<DateOnly, decimal> BenchmarkReturns { get; set; } = [];
+    private SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; } = [];
+    private SortedDictionary<DateOnlyCustom, decimal> PortfolioReturns { get; set; } = [];
+    private SortedDictionary<DateOnlyCustom, decimal> BenchmarkReturns { get; set; } = [];
 
     /// <summary>
     /// Initialize the performance engine with performance data points.
     /// </summary>
     /// <param name="performance_data"></param>
-    public PerformanceEngine(SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> performance_data)
+    public PerformanceEngine(SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> performance_data)
     {
         this.PerformanceData = performance_data;
         this.PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
@@ -36,13 +36,13 @@ public class PerformanceEngine
     public List<PerformanceAnalyticsResults<DateOnlyCustom>> CalculatePerformanceDataSummary(DateOnly as_of_date)
     {
         List<PerformanceAnalyticsResults<DateOnlyCustom>> results = [];
-        foreach (PerformanceTimePeriod period in Enum.GetValues(typeof(PerformanceTimePeriod)))
+        foreach (PerformanceTimePeriod period in Enum.GetValues<PerformanceTimePeriod>())
         {
-            DateOnly startDate = GetPeriodStartDate(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max(), period);
-            DateOnly endDate = as_of_date;
+            DateOnlyCustom startDate = GetPeriodStartDate(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max(), period);
+            DateOnlyCustom endDate = as_of_date;
             if(PortfolioReturns.Keys.Min() <= startDate)
             {
-                SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= endDate && x.Key >= startDate).ToSortedDictionary();
+                SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= endDate && x.Key >= startDate).ToSortedDictionary();
                 PerformancePeriodAnalytics item = new(selected_data, period);
                 
                 var result = item.GetComputePeformanceForPeriod();
@@ -70,9 +70,9 @@ public class PerformanceEngine
         List<PerformanceAnalyticsResults<DateOnlyCustom>> results = [];
         while (selected_data_time >= min_date)
         {
-            DateOnly TargetEndDate = selected_data_time;
-            DateOnly TargetStartDate = time_step.GetPreviousTimeStep(selected_data_time).AddDays(1);
-            SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= TargetEndDate && x.Key >= TargetStartDate).ToSortedDictionary();
+            DateOnlyCustom TargetEndDate = selected_data_time;
+            DateOnlyCustom TargetStartDate = time_step.GetPreviousTimeStep(selected_data_time).AddDays(1);
+            SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= TargetEndDate && x.Key >= TargetStartDate).ToSortedDictionary();
             PerformancePeriodAnalytics item = new(selected_data, performance_time_period);
             
             var result = item.GetComputePeformanceForPeriod();

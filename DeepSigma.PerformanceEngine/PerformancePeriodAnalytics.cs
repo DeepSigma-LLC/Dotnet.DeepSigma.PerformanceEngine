@@ -12,10 +12,10 @@ namespace DeepSigma.PerformanceEngine;
 internal class PerformancePeriodAnalytics
 {
     private PerformanceTimePeriod PerformanceTimePeriod { get; set; }
-    private SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; }
+    private SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; }
 
     /// <inheritdoc cref="PerformancePeriodAnalytics"/>
-    internal PerformancePeriodAnalytics(SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> performance_data, PerformanceTimePeriod time_period)
+    internal PerformancePeriodAnalytics(SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> performance_data, PerformanceTimePeriod time_period)
     {
         this.PerformanceData = performance_data;
         this.PerformanceTimePeriod = time_period;
@@ -33,8 +33,8 @@ internal class PerformancePeriodAnalytics
             TimePeriod = PerformanceTimePeriod
         };
 
-        SortedDictionary<DateOnly, decimal> PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
-        SortedDictionary<DateOnly, decimal> BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
+        SortedDictionary<DateOnlyCustom, decimal> PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
+        SortedDictionary<DateOnlyCustom, decimal> BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
 
         if(IsMoreThanAYear(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max()) == true)
         {
