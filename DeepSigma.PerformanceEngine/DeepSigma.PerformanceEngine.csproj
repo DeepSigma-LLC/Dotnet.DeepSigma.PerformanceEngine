@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DeepSigma Performance Engine</Title>
     <Authors>DeepSigma LLC</Authors>
-    <Version>1.1.1.0</Version>
+    <Version>1.2.0.0</Version>
     <Description>C# library for computing investment performance.</Description>
     <PackageProjectUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DeepSigma-LLC/Dotnet.DeepSigma.PerformanceEngine</RepositoryUrl>
