@@ -1,21 +1,23 @@
 ﻿
 using DeepSigma.General;
+using DeepSigma.General.DateTimeUnification;
 
 namespace DeepSigma.PerformanceEngine.Models;
 
 /// <summary>
 /// Summary statistics for a set of performance data points.
 /// </summary>
-public class SummaryStatistics
+public class SummaryStatistics<TDate>()
+    where TDate : struct, IDateTime<TDate>
 {
     /// <summary>
     /// The latest date in the observation period.
     /// </summary>
-    public DateTime MaxDate { get; set; }
+    public TDate MaxDate { get; set; }
     /// <summary>
     /// The earliest date in the observation period.
     /// </summary>
-    public DateTime MinDate { get; set; }
+    public TDate MinDate { get; set; }
     /// <summary>
     /// Total days in the observation period.
     /// </summary>

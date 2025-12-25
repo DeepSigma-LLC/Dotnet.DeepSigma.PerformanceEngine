@@ -1,11 +1,14 @@
 ﻿
 
+using DeepSigma.General.DateTimeUnification;
+
 namespace DeepSigma.PerformanceEngine.Models;
 
 /// <summary>
 /// Data point for performance calculations
 /// </summary>
-public class PerformanceDataPoint()
+public class PerformanceDataPoint<TDate>()
+    where TDate : struct, IDateTime<TDate>
 {
     /// <summary>
     /// Portfolio Identifier.
@@ -15,7 +18,7 @@ public class PerformanceDataPoint()
     /// <summary>
     /// Date of the data point.
     /// </summary>
-    public DateTime DataDate { get; set; }
+    public TDate DataDate { get; set; }
 
     /// <summary>
     /// Gain or Loss amount for the period.

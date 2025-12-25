@@ -1,12 +1,14 @@
 ﻿using DeepSigma.General;
 using DeepSigma.PerformanceEngine.Enums;
+using DeepSigma.General.DateTimeUnification;
 
 namespace DeepSigma.PerformanceEngine.Models;
 
 /// <summary>
 /// Performance analytics results for a specified time period.
 /// </summary>
-public class PerformanceAnalyticsResults
+public class PerformanceAnalyticsResults<TDate>()
+    where TDate : struct, IDateTime<TDate>
 {
     /// <summary>
     /// Time period for the performance analytics.
@@ -15,11 +17,11 @@ public class PerformanceAnalyticsResults
     /// <summary>
     /// Start date for the performance analytics.
     /// </summary>
-    public DateTime StartDate { get; set; }
+    public TDate StartDate { get; set; }
     /// <summary>
     /// End date for the performance analytics.
     /// </summary>
-    public DateTime EndDate { get; set; }
+    public TDate EndDate { get; set; }
     /// <summary>
     /// Gain or Loss amount for the period.
     /// </summary>

@@ -3,6 +3,8 @@ using DeepSigma.PerformanceEngine.Enums;
 using DeepSigma.General.TimeStepper;
 using DeepSigma.PerformanceEngine.Models;
 using DeepSigma.General.Enums;
+using DeepSigma.General.DateTimeUnification;
+using DeepSigma.General;
 
 namespace DeepSigma.PerformanceEngine;
 
@@ -11,19 +13,19 @@ namespace DeepSigma.PerformanceEngine;
 /// </summary>
 public class PerformanceEngine
 {
-    private SortedDictionary<DateTime, PerformanceDataPoint> PerformanceData { get; set; } = [];
-    private SortedDictionary<DateTime, decimal> PortfolioReturns { get; set; } = new SortedDictionary<DateTime, decimal>();
-    private SortedDictionary<DateTime, decimal> BenchmarkReturns { get; set; } = new SortedDictionary<DateTime, decimal>();
+    private SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; } = [];
+    private SortedDictionary<DateOnly, decimal> PortfolioReturns { get; set; } = [];
+    private SortedDictionary<DateOnly, decimal> BenchmarkReturns { get; set; } = [];
 
     /// <summary>
     /// Initialize the performance engine with performance data points.
     /// </summary>
     /// <param name="performance_data"></param>
-    public PerformanceEngine(SortedDictionary<DateTime, PerformanceDataPoint> performance_data)
+    public PerformanceEngine(SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> performance_data)
     {
         this.PerformanceData = performance_data;
-        this.PortfolioReturns = PerformanceData.ToDictionary(x => x.Key, x => x.Value.PortfolioReturn).ToSortedDictionary();
-        this.BenchmarkReturns = PerformanceData.ToDictionary(x => x.Key, x => x.Value.BenchmarkReturn).ToSortedDictionary();
+        this.PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
+        this.BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
     }
 
     /// <summary>
@@ -31,16 +33,16 @@ public class PerformanceEngine
     /// </summary>
     /// <param name="as_of_date"></param>
     /// <returns></returns>
-    public List<PerformanceAnalyticsResults> CalculatePerformanceDataSummary(DateTime as_of_date)
+    public List<PerformanceAnalyticsResults<DateOnlyCustom>> CalculatePerformanceDataSummary(DateOnly as_of_date)
     {
-        List<PerformanceAnalyticsResults> results = [];
+        List<PerformanceAnalyticsResults<DateOnlyCustom>> results = [];
         foreach (PerformanceTimePeriod period in Enum.GetValues(typeof(PerformanceTimePeriod)))
         {
-            DateTime startDate = GetPeriodStartDate(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max(), period);
-            DateTime endDate = as_of_date;
+            DateOnly startDate = GetPeriodStartDate(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max(), period);
+            DateOnly endDate = as_of_date;
             if(PortfolioReturns.Keys.Min() <= startDate)
             {
-                SortedDictionary<DateTime, PerformanceDataPoint> selected_data = this.PerformanceData.Where(x => x.Key <= endDate && x.Key >= startDate).ToSortedDictionary();
+                SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= endDate && x.Key >= startDate).ToSortedDictionary();
                 PerformancePeriodAnalytics item = new(selected_data, period);
                 
                 var result = item.GetComputePeformanceForPeriod();
@@ -57,17 +59,20 @@ public class PerformanceEngine
     /// <param name="periodicity"></param>
     /// <param name="performance_time_period"></param>
     /// <returns></returns>
-    public List<PerformanceAnalyticsResults> CalculatePerformanceForCustomPeriodicity(DateTime as_of_date, Periodicity periodicity, PerformanceTimePeriod performance_time_period)
+    public List<PerformanceAnalyticsResults<DateOnlyCustom>> CalculatePerformanceForCustomPeriodicity(DateOnly as_of_date, Periodicity periodicity, PerformanceTimePeriod performance_time_period)
     {
-        List<PerformanceAnalyticsResults> results = [];
-        SelfAligningTimeStep time_step = new(periodicity, TimeInterval.Min_5, false);
-        DateTime min_date = PortfolioReturns.Keys.Min();
-        DateTime selected_data_time = as_of_date;
+        PeriodicityConfiguration config = new(periodicity);
+        SelfAligningTimeStepper<DateOnlyCustom> time_step = new(config);
+
+        DateOnly min_date = PortfolioReturns.Keys.Min();
+        DateOnly selected_data_time = as_of_date;
+
+        List<PerformanceAnalyticsResults<DateOnlyCustom>> results = [];
         while (selected_data_time >= min_date)
         {
-            DateTime TargetEndDate = selected_data_time;
-            DateTime TargetStartDate = time_step.GetPreviousTimeStep(selected_data_time).AddDays(1);
-            SortedDictionary<DateTime, PerformanceDataPoint> selected_data = this.PerformanceData.Where(x => x.Key <= TargetEndDate && x.Key >= TargetStartDate).ToSortedDictionary();
+            DateOnly TargetEndDate = selected_data_time;
+            DateOnly TargetStartDate = time_step.GetPreviousTimeStep(selected_data_time).AddDays(1);
+            SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> selected_data = this.PerformanceData.Where(x => x.Key <= TargetEndDate && x.Key >= TargetStartDate).ToSortedDictionary();
             PerformancePeriodAnalytics item = new(selected_data, performance_time_period);
             
             var result = item.GetComputePeformanceForPeriod();
@@ -77,7 +82,15 @@ public class PerformanceEngine
         return results;
     }
 
-    private DateTime GetPeriodStartDate(DateTime start_date, DateTime end_date, PerformanceTimePeriod period)
+    /// <summary>
+    /// Get the start date for a given performance time period.
+    /// </summary>
+    /// <param name="start_date"></param>
+    /// <param name="end_date"></param>
+    /// <param name="period"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private static DateOnly GetPeriodStartDate(DateOnly start_date, DateOnly end_date, PerformanceTimePeriod period)
     {
         switch (period)
         {
@@ -88,16 +101,20 @@ public class PerformanceEngine
             case (PerformanceTimePeriod.Day3):
                 return end_date.AddWeekdays(-3);
             case (PerformanceTimePeriod.WTD):
-                SelfAligningTimeStep weeklyTimeStep = new(Periodicity.Weekly, TimeInterval.Min_5, false);
+                PeriodicityConfiguration weekly_config = new(Periodicity.Weekly);
+                SelfAligningTimeStepper<DateOnlyCustom> weeklyTimeStep = new(weekly_config, required_day_of_week: DayOfWeek.Friday);
                 return weeklyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.MTD):
-                SelfAligningTimeStep monthlyTimeStep = new(Periodicity.Monthly, TimeInterval.Min_5, false);
+                PeriodicityConfiguration monthly_config = new(Periodicity.Monthly);
+                SelfAligningTimeStepper<DateOnlyCustom> monthlyTimeStep = new(monthly_config);
                 return monthlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.QTD):
-                SelfAligningTimeStep quarterlyTimeStep = new(Periodicity.Quarterly, TimeInterval.Min_5, false);
+                PeriodicityConfiguration quarterly_config = new(Periodicity.Quarterly);
+                SelfAligningTimeStepper<DateOnlyCustom> quarterlyTimeStep = new(quarterly_config);
                 return quarterlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.YTD):
-                SelfAligningTimeStep yearlyTimeStep = new(Periodicity.Annually, TimeInterval.Min_5, false);
+                PeriodicityConfiguration annual_config = new(Periodicity.Annually);
+                SelfAligningTimeStepper<DateOnlyCustom> yearlyTimeStep = new(annual_config);
                 return yearlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.OneYear):
                 return end_date.AddYears(-1).AddDays(1);

@@ -2,6 +2,7 @@
 using DeepSigma.PerformanceEngine.Models;
 using DeepSigma.Mathematics.Statistics;
 using DeepSigma.General.Extensions;
+using DeepSigma.General.DateTimeUnification;
 
 namespace DeepSigma.PerformanceEngine;
 
@@ -11,8 +12,10 @@ namespace DeepSigma.PerformanceEngine;
 internal class PerformancePeriodAnalytics
 {
     private PerformanceTimePeriod PerformanceTimePeriod { get; set; }
-    private SortedDictionary<DateTime, PerformanceDataPoint> PerformanceData { get; set; }
-    internal PerformancePeriodAnalytics(SortedDictionary<DateTime, PerformanceDataPoint> performance_data, PerformanceTimePeriod time_period)
+    private SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> PerformanceData { get; set; }
+
+    /// <inheritdoc cref="PerformancePeriodAnalytics"/>
+    internal PerformancePeriodAnalytics(SortedDictionary<DateOnly, PerformanceDataPoint<DateOnlyCustom>> performance_data, PerformanceTimePeriod time_period)
     {
         this.PerformanceData = performance_data;
         this.PerformanceTimePeriod = time_period;
@@ -21,15 +24,17 @@ internal class PerformancePeriodAnalytics
     /// <summary>
     /// Compute the performance analytics based on the performance data points.
     /// </summary>
-    internal PerformanceAnalyticsResults GetComputePeformanceForPeriod()
+    internal PerformanceAnalyticsResults<DateOnlyCustom> GetComputePeformanceForPeriod()
     {
-        PerformanceAnalyticsResults results = new();
-        results.StartDate = PerformanceData.Keys.Min();
-        results.EndDate = PerformanceData.Keys.Max();
-        results.TimePeriod = PerformanceTimePeriod;
+        PerformanceAnalyticsResults<DateOnlyCustom> results = new()
+        {
+            StartDate = PerformanceData.Keys.Min(),
+            EndDate = PerformanceData.Keys.Max(),
+            TimePeriod = PerformanceTimePeriod
+        };
 
-        SortedDictionary<DateTime, decimal> PortfolioReturns = PerformanceData.ToDictionary(x => x.Key, x => x.Value.PortfolioReturn).ToSortedDictionary();
-        SortedDictionary<DateTime, decimal> BenchmarkReturns = PerformanceData.ToDictionary(x => x.Key, x => x.Value.BenchmarkReturn).ToSortedDictionary();
+        SortedDictionary<DateOnly, decimal> PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
+        SortedDictionary<DateOnly, decimal> BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
 
         if(IsMoreThanAYear(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max()) == true)
         {
@@ -64,13 +69,15 @@ internal class PerformancePeriodAnalytics
         return results;
     }
 
-    private bool IsMoreThanAYear(DateTime StartDate, DateTime EndDate)
+    /// <summary>
+    /// Check if the period between StartDate and EndDate is more than a year.
+    /// </summary>
+    /// <param name="StartDate"></param>
+    /// <param name="EndDate"></param>
+    /// <returns></returns>
+    private static bool IsMoreThanAYear(DateOnlyCustom StartDate, DateOnlyCustom EndDate)
     {
         TimeSpan timeSpan = EndDate - StartDate;
-        if (timeSpan.TotalDays < 365)
-        {
-            return false;
-        }
-        return true;
+        return timeSpan.TotalDays > 365;
     }
 }

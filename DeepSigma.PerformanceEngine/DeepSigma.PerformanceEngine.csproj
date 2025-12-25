@@ -18,8 +18,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DeepSigma.General" Version="1.6.0" />
-    <PackageReference Include="DeepSigma.Mathematics" Version="1.1.0" />
+    <PackageReference Include="DeepSigma.General" Version="2.3.2" />
+    <PackageReference Include="DeepSigma.Mathematics" Version="1.2.1" />
   </ItemGroup>
 
   <ItemGroup>
