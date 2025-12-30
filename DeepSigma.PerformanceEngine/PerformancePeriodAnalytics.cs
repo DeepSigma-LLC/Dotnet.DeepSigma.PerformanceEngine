@@ -33,8 +33,8 @@ internal class PerformancePeriodAnalytics
             TimePeriod = PerformanceTimePeriod
         };
 
-        SortedDictionary<DateOnlyCustom, decimal> PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
-        SortedDictionary<DateOnlyCustom, decimal> BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
+        SortedDictionary<DateOnlyCustom, decimal> PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeries(x => x.PortfolioReturn).ToSortedDictionary();
+        SortedDictionary<DateOnlyCustom, decimal> BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeries(x => x.BenchmarkReturn).ToSortedDictionary();
 
         if(IsMoreThanAYear(PortfolioReturns.Keys.Min(), PortfolioReturns.Keys.Max()) == true)
         {

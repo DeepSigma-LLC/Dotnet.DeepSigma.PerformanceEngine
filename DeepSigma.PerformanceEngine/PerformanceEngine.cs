@@ -24,8 +24,8 @@ public class PerformanceEngine
     public PerformanceEngine(SortedDictionary<DateOnlyCustom, PerformanceDataPoint<DateOnlyCustom>> performance_data)
     {
         this.PerformanceData = performance_data;
-        this.PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.PortfolioReturn);
-        this.BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeriesSorted(x => x.BenchmarkReturn);
+        this.PortfolioReturns = PerformanceData.GetExtractedPropertyAsSeries(x => x.PortfolioReturn).ToSortedDictionary();
+        this.BenchmarkReturns = PerformanceData.GetExtractedPropertyAsSeries(x => x.BenchmarkReturn).ToSortedDictionary();
     }
 
     /// <summary>
