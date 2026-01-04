@@ -56,13 +56,12 @@ public class PerformanceEngine
     /// Calculate performance on intervals based on the specified periodicity.
     /// </summary>
     /// <param name="as_of_date"></param>
-    /// <param name="periodicity"></param>
+    /// <param name="configuration"></param>
     /// <param name="performance_time_period"></param>
     /// <returns></returns>
-    public List<PerformanceAnalyticsResults<DateOnlyCustom>> CalculatePerformanceForCustomPeriodicity(DateOnly as_of_date, Periodicity periodicity, PerformanceTimePeriod performance_time_period)
+    public List<PerformanceAnalyticsResults<DateOnlyCustom>> CalculatePerformanceForCustomPeriodicity(DateOnly as_of_date, TimeStepperConfiguration configuration, PerformanceTimePeriod performance_time_period)
     {
-        PeriodicityConfiguration config = new(periodicity);
-        SelfAligningTimeStepper<DateOnlyCustom> time_step = new(config);
+        SelfAligningTimeStepper<DateOnlyCustom> time_step = new(configuration);
 
         DateOnly min_date = PortfolioReturns.Keys.Min();
         DateOnly selected_data_time = as_of_date;
@@ -101,19 +100,36 @@ public class PerformanceEngine
             case (PerformanceTimePeriod.Day3):
                 return end_date.AddWeekdays(-3);
             case (PerformanceTimePeriod.WTD):
-                PeriodicityConfiguration weekly_config = new(Periodicity.Weekly);
-                SelfAligningTimeStepper<DateOnlyCustom> weeklyTimeStep = new(weekly_config, required_day_of_week: DayOfWeek.Friday);
+                TimeStepperConfiguration weekly_config = new()
+                {
+                    PeriodicityConfig = new(Periodicity.Weekly),
+                    AdjustmentType = DateAdjustmentType.MoveBackward,
+                    RequiredDayOfWeek = DayOfWeek.Friday
+                };
+                SelfAligningTimeStepper<DateOnlyCustom> weeklyTimeStep = new(weekly_config);
                 return weeklyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.MTD):
-                PeriodicityConfiguration monthly_config = new(Periodicity.Monthly);
+                TimeStepperConfiguration monthly_config = new()
+                {
+                    PeriodicityConfig = new(Periodicity.Monthly),
+                    AdjustmentType = DateAdjustmentType.MoveBackward,
+                };
                 SelfAligningTimeStepper<DateOnlyCustom> monthlyTimeStep = new(monthly_config);
                 return monthlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.QTD):
-                PeriodicityConfiguration quarterly_config = new(Periodicity.Quarterly);
+                TimeStepperConfiguration quarterly_config = new()
+                {
+                    PeriodicityConfig = new(Periodicity.Quarterly),
+                    AdjustmentType = DateAdjustmentType.MoveBackward,
+                };
                 SelfAligningTimeStepper<DateOnlyCustom> quarterlyTimeStep = new(quarterly_config);
                 return quarterlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.YTD):
-                PeriodicityConfiguration annual_config = new(Periodicity.Annually);
+                TimeStepperConfiguration annual_config = new()
+                {
+                    PeriodicityConfig = new(Periodicity.Annually),
+                    AdjustmentType = DateAdjustmentType.MoveBackward,
+                };
                 SelfAligningTimeStepper<DateOnlyCustom> yearlyTimeStep = new(annual_config);
                 return yearlyTimeStep.GetPreviousTimeStep(end_date).AddDays(1);
             case (PerformanceTimePeriod.OneYear):
